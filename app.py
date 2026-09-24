@@ -19,22 +19,43 @@ st.markdown(
 
     .stApp {
         background-color: #fffaf2;
+
         background-image:
-            radial-gradient(circle at 10% 20%, rgba(255,190,220,0.35) 0 4px, transparent 5px),
-            radial-gradient(circle at 80% 30%, rgba(180,210,255,0.35) 0 5px, transparent 6px),
-            radial-gradient(circle at 30% 80%, rgba(210,190,255,0.35) 0 4px, transparent 5px),
-            radial-gradient(circle at 90% 85%, rgba(255,220,160,0.35) 0 5px, transparent 6px);
+            radial-gradient(
+                circle at 10% 20%,
+                rgba(255,190,220,0.35) 0 4px,
+                transparent 5px
+            ),
+            radial-gradient(
+                circle at 80% 30%,
+                rgba(180,210,255,0.35) 0 5px,
+                transparent 6px
+            ),
+            radial-gradient(
+                circle at 30% 80%,
+                rgba(210,190,255,0.35) 0 4px,
+                transparent 5px
+            ),
+            radial-gradient(
+                circle at 90% 85%,
+                rgba(255,220,160,0.35) 0 5px,
+                transparent 6px
+            );
+
         background-size: 180px 180px;
     }
 
 
-    h1, h2, h3 {
+    h1,
+    h2,
+    h3 {
         font-family: Georgia, serif !important;
         color: #76559b !important;
     }
 
 
-    p, label, .stMarkdown {
+    p,
+    .stMarkdown {
         color: #333333;
     }
 
@@ -78,13 +99,16 @@ st.markdown(
     }
 
 
-    /* Yazı yazılan kutular */
+    /* =====================================================
+       YAZI KUTULARI
+       ===================================================== */
 
     .stTextInput input,
     .stTextArea textarea {
         background-color: #ffffff !important;
         color: #333333 !important;
         caret-color: #76559b !important;
+
         border: 1px solid rgba(120, 90, 160, 0.25) !important;
         border-radius: 12px !important;
     }
@@ -94,8 +118,11 @@ st.markdown(
     .stTextArea textarea:focus {
         background-color: #ffffff !important;
         color: #333333 !important;
+
         border: 1px solid #a77ac7 !important;
-        box-shadow: 0 0 0 2px rgba(167, 122, 199, 0.15) !important;
+
+        box-shadow:
+            0 0 0 2px rgba(167, 122, 199, 0.15) !important;
     }
 
 
@@ -110,24 +137,36 @@ st.markdown(
        VIBE TESTİ CEVAPLARI
        ===================================================== */
 
-    .stRadio label,
-    .stRadio label p {
-        color: #333333 !important;
-    }
-
-
-    .stRadio [data-testid="stMarkdownContainer"] p {
-        color: #333333 !important;
+    .stRadio div[role="radiogroup"] {
+        gap: 8px;
     }
 
 
     .stRadio div[role="radiogroup"] label {
-        color: #333333 !important;
+        background-color: #ffffff !important;
+        color: #76559b !important;
+
+        border: 1px solid rgba(118, 85, 155, 0.20) !important;
+
+        border-radius: 12px !important;
+
+        padding: 8px 12px !important;
     }
 
 
     .stRadio div[role="radiogroup"] label p {
-        color: #333333 !important;
+        color: #76559b !important;
+    }
+
+
+    .stRadio div[role="radiogroup"] label:hover {
+        background-color: #f5effa !important;
+        border-color: #a77ac7 !important;
+    }
+
+
+    .stRadio div[role="radiogroup"] label span {
+        color: #76559b !important;
     }
 
 
@@ -175,14 +214,6 @@ def veritabani():
     )
 
 
-    # Eski veritabanlarında eksik kolonlar varsa ekle
-
-    kolonlar = [
-        "instagram_goster",
-        "tiktok_goster"
-    ]
-
-
     mevcut_kolonlar = [
         row["name"]
         for row in conn.execute(
@@ -191,20 +222,28 @@ def veritabani():
     ]
 
 
-    for kolon in kolonlar:
+    if "instagram_goster" not in mevcut_kolonlar:
 
-        if kolon not in mevcut_kolonlar:
+        conn.execute(
+            """
+            ALTER TABLE kullanicilar
+            ADD COLUMN instagram_goster INTEGER DEFAULT 0
+            """
+        )
 
-            conn.execute(
-                f"""
-                ALTER TABLE kullanicilar
-                ADD COLUMN {kolon} INTEGER DEFAULT 0
-                """
-            )
+
+    if "tiktok_goster" not in mevcut_kolonlar:
+
+        conn.execute(
+            """
+            ALTER TABLE kullanicilar
+            ADD COLUMN tiktok_goster INTEGER DEFAULT 0
+            """
+        )
 
 
     # =====================================================
-    # DEĞERLENDİRMELER TABLOSU
+    # DEĞERLENDİRME TABLOSU
     # =====================================================
 
     conn.execute(
@@ -367,6 +406,7 @@ if not st.session_state.giris_yapildi:
 
     st.title("✨ EKİPLEN")
 
+
     st.write(
         "Yeni insanlarla tanış, vibe'ını keşfet "
         "ve sana uygun kişilerle eşleş! 💜"
@@ -375,10 +415,6 @@ if not st.session_state.giris_yapildi:
 
     st.divider()
 
-
-    # =====================================================
-    # KVKK
-    # =====================================================
 
     kvkk_onay = st.checkbox(
         "KVKK metnini okudum ve kabul ediyorum."
@@ -398,13 +434,11 @@ if not st.session_state.giris_yapildi:
     )
 
 
-    if st.session_state.sifreyi_goster:
-
-        sifre_tipi = "default"
-
-    else:
-
-        sifre_tipi = "password"
+    sifre_tipi = (
+        "default"
+        if st.session_state.sifreyi_goster
+        else "password"
+    )
 
 
     sifre = st.text_input(
@@ -525,9 +559,11 @@ if not st.session_state.giris_yapildi:
 
                 st.session_state.profil_tamamlandi = False
 
+
                 st.success(
                     "Kayıt başarılı! Şimdi profilini tamamlayabilirsin. 💜"
                 )
+
 
                 st.rerun()
 
@@ -558,6 +594,7 @@ kullanici = kullanici_getir(kullanici_adi)
 if not st.session_state.profil_tamamlandi:
 
     st.title("👤 Profilini Tamamla")
+
 
     st.write(
         "EKİPLEN'e devam etmek için birkaç küçük bilgi ekleyelim. 💜"
@@ -624,9 +661,11 @@ if not st.session_state.profil_tamamlandi:
 
         st.session_state.profil_tamamlandi = True
 
+
         st.success(
             "Profilin hazır! ✨"
         )
+
 
         st.rerun()
 
@@ -664,8 +703,6 @@ if (
     st.divider()
 
 
-    # SORU 1
-
     st.subheader(
         "1. Birisiyle arkadaşlık kurabildin mi?"
     )
@@ -680,8 +717,6 @@ if (
         key="degerlendirme_soru_1"
     )
 
-
-    # SORU 2
 
     st.subheader(
         "2. Testler sence eğlenceli mi?"
@@ -699,8 +734,6 @@ if (
     )
 
 
-    # SORU 3
-
     st.subheader(
         "3. Neleri geliştirebiliriz?"
     )
@@ -712,8 +745,6 @@ if (
         key="degerlendirme_soru_3"
     )
 
-
-    # SORU 4
 
     st.subheader(
         "4. Neyi beğendin veya beğenmedin?"
@@ -759,7 +790,6 @@ if (
                     neleri_gelistirebiliriz,
                     neyi_begendin_veya_begenmedin
                 )
-
                 VALUES (?, ?, ?, ?, ?)
                 """,
                 (
@@ -1090,8 +1120,10 @@ elif sayfa == "👥 Arkadaş Eşleştirme":
                         <div class="sosyal-kutu">
 
                         📸 Instagram:
-                        <a href="https://instagram.com/{kisi["instagram"].lstrip("@")}"
-                        target="_blank">
+                        <a
+                            href="https://instagram.com/{kisi["instagram"].lstrip("@")}"
+                            target="_blank"
+                        >
 
                         @{kisi["instagram"].lstrip("@")}
 
@@ -1114,8 +1146,10 @@ elif sayfa == "👥 Arkadaş Eşleştirme":
                         <div class="sosyal-kutu">
 
                         🎵 TikTok:
-                        <a href="https://www.tiktok.com/@{kisi["tiktok"].lstrip("@")}"
-                        target="_blank">
+                        <a
+                            href="https://www.tiktok.com/@{kisi["tiktok"].lstrip("@")}"
+                            target="_blank"
+                        >
 
                         @{kisi["tiktok"].lstrip("@")}
 
