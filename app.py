@@ -202,6 +202,30 @@ def veritabani():
             ADD COLUMN tiktok_goster INTEGER DEFAULT 0
         """)
 
+    # =====================================================
+    # DEĞERLENDİRME TABLOSU
+    # =====================================================
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS degerlendirmeler (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            kullanici_adi TEXT UNIQUE NOT NULL,
+
+            arkadaslik_kurabildin_mi TEXT NOT NULL,
+
+            testler_eglenceli_mi TEXT NOT NULL,
+
+            neleri_gelistirebiliriz TEXT NOT NULL,
+
+            neyi_begendin_veya_begenmedin TEXT NOT NULL,
+
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+
+        )
+    """)
+
     conn.commit()
 
     return conn
@@ -286,6 +310,56 @@ def kullanici_getir(kullanici_adi):
 
 
 # =========================================================
+# DEĞERLENDİRME KONTROLÜ
+# =========================================================
+
+def degerlendirme_var_mi(kullanici_adi):
+
+    sonuc = conn.execute(
+        """
+        SELECT id
+        FROM degerlendirmeler
+        WHERE kullanici_adi = ?
+        """,
+        (kullanici_adi,)
+    ).fetchone()
+
+    return sonuc is not None
+
+
+# =========================================================
+# EŞLEŞME KONTROLÜ
+# =========================================================
+
+def eslesme_var_mi(kullanici_adi):
+
+    kullanici = kullanici_getir(
+        kullanici_adi
+    )
+
+    if not kullanici or not kullanici["vibe"]:
+
+        return False
+
+    sonuc = conn.execute(
+        """
+        SELECT id
+        FROM kullanicilar
+
+        WHERE vibe = ?
+
+        AND kullanici_adi != ?
+        """,
+        (
+            kullanici["vibe"],
+            kullanici_adi
+        )
+    ).fetchone()
+
+    return sonuc is not None
+
+
+# =========================================================
 # KVKK METNİ
 # =========================================================
 
@@ -310,6 +384,7 @@ Uygulama içerisinde aşağıdaki bilgiler işlenebilir:
 - Kullanıcının isteğe bağlı olarak eklediği Instagram kullanıcı adı
 - Kullanıcının isteğe bağlı olarak eklediği TikTok kullanıcı adı
 - Sosyal medya bilgilerinin eşleşen kişilere gösterilmesine ilişkin tercih
+- EKİPLEN değerlendirme anketine verilen cevaplar
 
 **3. Kişisel Verilerin İşlenme Amaçları**
 
@@ -321,7 +396,8 @@ Bu bilgiler;
 - Vibe Testi sonucunun kaydedilmesi,
 - Benzer Vibe sonucuna sahip kullanıcıların eşleştirilmesi,
 - Kullanıcının kendi isteğiyle eklediği sosyal medya bilgilerinin
-  eşleşme sonuçlarında gösterilmesi
+  eşleşme sonuçlarında gösterilmesi,
+- EKİPLEN deneyiminin değerlendirilmesi ve geliştirilmesi
 
 amaçlarıyla kullanılmaktadır.
 
@@ -342,17 +418,26 @@ Kullanıcıların özel profil fotoğrafı yüklemesine izin verilmemektedir.
 Profil için yalnızca EKİPLEN tarafından sunulan hazır avatarlar
 kullanılmaktadır.
 
-**6. Veri Güvenliği**
+**6. Değerlendirme Anketi**
+
+Kullanıcılar bir eşleşme gerçekleştikten sonra EKİPLEN deneyimini
+değerlendirmek amacıyla kısa bir değerlendirme anketini doldurur.
+
+Anket içerisinde arkadaşlık kurma durumu, testlerin eğlenceli olup
+olmadığı ve kullanıcının geliştirme önerileri ile beğendiği veya
+beğenmediği noktalar sorulmaktadır.
+
+**7. Veri Güvenliği**
 
 Kişisel verilerin güvenliğinin sağlanması amacıyla gerekli teknik
 ve idari tedbirlerin alınması hedeflenmektedir.
 
-**7. Kullanıcının Hakları**
+**8. Kullanıcının Hakları**
 
 İlgili kişiler, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun
 11. maddesi kapsamında kanunda belirtilen haklarını kullanabilir.
 
-**8. İletişim**
+**9. İletişim**
 
 Kişisel verilerinizle ilgili sorularınız için EKİPLEN proje ekibi
 ile iletişime geçebilirsiniz.
@@ -360,7 +445,7 @@ ile iletişime geçebilirsiniz.
 > Not: Bu metin teknik proje için örnek bir aydınlatma metnidir.
 > Yayına almadan önce proje ekibinizin gerçek bilgileriyle
 > güncellenmesi ve gerektiğinde hukuki uzman görüşü alınması gerekir.
-""")
+""") 
 
 
 # =========================================================
@@ -695,6 +780,168 @@ if not st.session_state.profil_tamamlandi:
 kullanici = kullanici_getir(
     kullanici_adi
 )
+
+
+# =========================================================
+# ZORUNLU DEĞERLENDİRME KONTROLÜ
+# =========================================================
+
+# Kullanıcı daha önce bir değerlendirme yapmadıysa
+# ve en az bir kişiyle eşleşmişse değerlendirme açılır.
+
+if (
+    eslesme_var_mi(kullanici_adi)
+    and
+    not degerlendirme_var_mi(kullanici_adi)
+):
+
+    st.title("⭐ Bizi Değerlendir")
+
+    st.write(
+        "Bir eşleşme gerçekleştirdin! 🎉 "
+        "Şimdi EKİPLEN deneyimini birkaç kısa soruyla "
+        "değerlendirmeni istiyoruz."
+    )
+
+    st.info(
+        "Bu değerlendirme zorunludur. "
+        "Cevaplarını gönderdikten sonra EKİPLEN'i "
+        "kullanmaya devam edebilirsin. 💜"
+    )
+
+    st.divider()
+
+
+    # -----------------------------------------------------
+    # SORU 1
+    # -----------------------------------------------------
+
+    st.subheader(
+        "1. Birisiyle arkadaşlık kurabildin mi?"
+    )
+
+    arkadaslik_kurabildin_mi = st.radio(
+        "Cevabını seç:",
+        [
+            "Evet",
+            "Hayır"
+        ],
+        key="degerlendirme_soru_1"
+    )
+
+
+    # -----------------------------------------------------
+    # SORU 2
+    # -----------------------------------------------------
+
+    st.subheader(
+        "2. Testler sence eğlenceli mi?"
+    )
+
+    testler_eglenceli_mi = st.radio(
+        "Cevabını seç:",
+        [
+            "Evet",
+            "Hayır",
+            "Biraz"
+        ],
+        key="degerlendirme_soru_2"
+    )
+
+
+    # -----------------------------------------------------
+    # SORU 3
+    # -----------------------------------------------------
+
+    st.subheader(
+        "3. Neleri geliştirebiliriz?"
+    )
+
+    neleri_gelistirebiliriz = st.text_area(
+        "Fikrini bizimle paylaş:",
+        placeholder="Buraya düşüncelerini yazabilirsin...",
+        key="degerlendirme_soru_3"
+    )
+
+
+    # -----------------------------------------------------
+    # SORU 4
+    # -----------------------------------------------------
+
+    st.subheader(
+        "4. Neyi beğendin veya beğenmedin?"
+    )
+
+    neyi_begendin_veya_begenmedin = st.text_area(
+        "Düşüncelerini yaz:",
+        placeholder="Beğendiğin veya beğenmediğin şeyleri yazabilirsin...",
+        key="degerlendirme_soru_4"
+    )
+
+
+    st.divider()
+
+
+    # -----------------------------------------------------
+    # DEĞERLENDİRMEYİ GÖNDER
+    # -----------------------------------------------------
+
+    if st.button(
+        "💜 Değerlendirmeyi Gönder",
+        use_container_width=True
+    ):
+
+        if not neleri_gelistirebiliriz.strip():
+
+            st.warning(
+                "Lütfen 3. soruyu cevapla. 💭"
+            )
+
+        elif not neyi_begendin_veya_begenmedin.strip():
+
+            st.warning(
+                "Lütfen 4. soruyu cevapla. 💭"
+            )
+
+        else:
+
+            conn.execute(
+                """
+                INSERT INTO degerlendirmeler
+                (
+                    kullanici_adi,
+                    arkadaslik_kurabildin_mi,
+                    testler_eglenceli_mi,
+                    neleri_gelistirebiliriz,
+                    neyi_begendin_veya_begenmedin
+                )
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    kullanici_adi,
+                    arkadaslik_kurabildin_mi,
+                    testler_eglenceli_mi,
+                    neleri_gelistirebiliriz.strip(),
+                    neyi_begendin_veya_begenmedin.strip()
+                )
+            )
+
+            conn.commit()
+
+            st.success(
+                "Değerlendirmen için çok teşekkür ederiz! 💜✨"
+            )
+
+            st.balloons()
+
+            st.rerun()
+
+
+    # -----------------------------------------------------
+    # DEĞERLENDİRME TAMAMLANMADAN DEVAM EDİLEMEZ
+    # -----------------------------------------------------
+
+    st.stop()
 
 
 # =========================================================
