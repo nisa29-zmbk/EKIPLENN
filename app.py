@@ -94,6 +94,51 @@ h3 {
 }
 
 
+/* Yazı yazılan kutular */
+
+.stTextInput input,
+.stTextArea textarea {
+
+    background-color: #ffffff !important;
+
+    color: #333333 !important;
+
+    caret-color: #76559b !important;
+
+    border: 1px solid rgba(120, 90, 160, 0.25) !important;
+
+    border-radius: 12px !important;
+}
+
+
+/* Yazı yazarken kutunun görünümü */
+
+.stTextInput input:focus,
+.stTextArea textarea:focus {
+
+    background-color: #ffffff !important;
+
+    color: #333333 !important;
+
+    border: 1px solid #a77ac7 !important;
+
+    box-shadow: 0 0 0 2px rgba(167, 122, 199, 0.15) !important;
+
+}
+
+
+/* Placeholder yazısı */
+
+.stTextInput input::placeholder,
+.stTextArea textarea::placeholder {
+
+    color: #888888 !important;
+
+    opacity: 1 !important;
+
+}
+
+
 /* Kart */
 
 .kart {
@@ -201,6 +246,7 @@ def veritabani():
             ALTER TABLE kullanicilar
             ADD COLUMN tiktok_goster INTEGER DEFAULT 0
         """)
+
 
     # =====================================================
     # DEĞERLENDİRME TABLOSU
@@ -445,7 +491,7 @@ ile iletişime geçebilirsiniz.
 > Not: Bu metin teknik proje için örnek bir aydınlatma metnidir.
 > Yayına almadan önce proje ekibinizin gerçek bilgileriyle
 > güncellenmesi ve gerektiğinde hukuki uzman görüşü alınması gerekir.
-""") 
+""")
 
 
 # =========================================================
