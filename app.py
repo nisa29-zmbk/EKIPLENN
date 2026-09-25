@@ -7,49 +7,155 @@ st.set_page_config(page_title="EKİPLEN", page_icon="✨", layout="centered")
 
 st.markdown("""
 <style>
-.stApp { background-color: #fffaf2; color: #333333; }
-h1, h2, h3 { font-family: Georgia, serif; color: #333333; }
-p, label { color: #333333; }
-.stRadio label p, .stCheckbox label p { color: #403746 !important; }
-.stTextInput input, .stTextArea textarea {
-    background-color: white !important;
-    color: #333333 !important;
-    border: 1px solid #d8c9df !important;
+/* GENEL SAYFA */
+.stApp {
+    background-color: #171321;
+    color: white;
+}
+
+/* BAŞLIKLAR */
+h1, h2, h3, h4 {
+    font-family: Georgia, serif;
+    color: white !important;
+}
+
+/* NORMAL YAZILAR */
+p, label, span, div {
+    color: white;
+}
+
+/* RADIO VE CHECKBOX YAZILARI */
+.stRadio label p,
+.stCheckbox label p {
+    color: white !important;
+}
+
+/* INPUTLAR */
+.stTextInput input,
+.stTextArea textarea {
+    background-color: #241e2e !important;
+    color: white !important;
+    border: 1px solid #8f70ad !important;
     border-radius: 12px !important;
 }
-.stTextInput input:focus, .stTextArea textarea:focus { border-color: #a77ac7 !important; }
-.stButton > button { border-radius: 12px; border: none; font-weight: 600; }
-.stButton > button:hover { transform: translateY(-2px); }
 
+.stTextInput input::placeholder,
+.stTextArea textarea::placeholder {
+    color: #c9bfd2 !important;
+}
+
+.stTextInput input:focus,
+.stTextArea textarea:focus {
+    border-color: #c49be8 !important;
+}
+
+/* BUTONLAR */
+.stButton > button {
+    background-color: #8f70ad;
+    color: white !important;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+}
+
+.stButton > button:hover {
+    background-color: #a984c5;
+    color: white !important;
+    transform: translateY(-2px);
+}
+
+/* YAN MENÜ */
+section[data-testid="stSidebar"] {
+    background-color: #211b2b;
+}
+
+section[data-testid="stSidebar"] * {
+    color: white !important;
+}
+
+/* KARTLAR */
+.kart {
+    background: #241e2e;
+    color: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 5px 20px rgba(0,0,0,.35);
+    border: 1px solid #3d304b;
+}
+
+.kart h2,
+.kart h3,
+.kart p {
+    color: white !important;
+}
+
+/* AVATAR */
+.avatar {
+    font-size: 55px;
+    text-align: center;
+}
+
+/* PUANTİYE ARKA PLAN */
 .stApp::before {
-    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background-image: radial-gradient(circle, rgba(255,190,120,.25) 2px, transparent 3px),
-                      radial-gradient(circle, rgba(190,150,255,.20) 2px, transparent 3px);
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+
+    background-image:
+        radial-gradient(circle, rgba(255,216,77,.25) 2px, transparent 3px),
+        radial-gradient(circle, rgba(190,150,255,.20) 2px, transparent 3px);
+
     background-size: 80px 80px, 110px 110px;
+
     animation: hareket 20s linear infinite;
 }
 
 @keyframes hareket {
-    from { background-position: 0 0, 30px 30px; }
-    to { background-position: 160px 160px, 200px 200px; }
+    from {
+        background-position: 0 0, 30px 30px;
+    }
+
+    to {
+        background-position: 160px 160px, 200px 200px;
+    }
 }
 
-.kart {
-    background: rgba(255,255,255,.93);
-    border-radius: 20px;
-    padding: 20px;
-    margin: 15px 0;
-    box-shadow: 0 5px 20px rgba(0,0,0,.08);
-}
-.avatar { font-size: 55px; text-align: center; }
+/* VIBE KARTI */
 .vibe-kart {
-    border-radius: 25px; padding: 30px 20px; margin-top: 25px;
-    text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,.12);
+    border-radius: 25px;
+    padding: 30px 20px;
+    margin-top: 25px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,.35);
 }
-.vibe-emoji { font-size: 58px; }
-.vibe-baslik { font-family: Georgia, serif; font-size: 30px; font-weight: bold; color: #3e3045 !important; margin-top: 5px; }
-.vibe-yazi { color: #4b414f !important; font-size: 16px; line-height: 1.6; margin-top: 10px; }
-.vibe-alt { color: #665b6d !important; font-size: 14px; margin-top: 15px; }
+
+.vibe-emoji {
+    font-size: 58px;
+}
+
+.vibe-baslik {
+    font-family: Georgia, serif;
+    font-size: 30px;
+    font-weight: bold;
+    color: #3e3045 !important;
+    margin-top: 5px;
+}
+
+.vibe-yazi {
+    color: #4b414f !important;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 10px;
+}
+
+.vibe-alt {
+    color: #665b6d !important;
+    font-size: 14px;
+    margin-top: 15px;
+}
 </style>
 """, unsafe_allow_html=True)
 
