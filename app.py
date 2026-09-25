@@ -1,1851 +1,447 @@
 import sqlite3
 import streamlit as st
 
-
-# =========================================================
-# YÖNETİCİ ŞİFRESİ
-# =========================================================
-
 YONETICI_SIFRE = "EKİPLENSİNN05"
 
-
-# =========================================================
-# SAYFA AYARLARI
-# =========================================================
-
-st.set_page_config(
-    page_title="EKİPLEN",
-    page_icon="✨",
-    layout="centered"
-)
-
-
-# =========================================================
-# CSS
-# =========================================================
+st.set_page_config(page_title="EKİPLEN", page_icon="✨", layout="centered")
 
 st.markdown("""
 <style>
-
-.stApp {
-    background: #fffaf2;
-    color: #333333;
-}
-
-
-/* Genel yazı renkleri */
-
-p,
-label,
-span,
-div,
-.stMarkdown {
-    color: #333333;
-}
-
-
-/* Başlıklar */
-
-h1,
-h2,
-h3 {
-    font-family: Georgia, serif;
-    color: #333333;
-}
-
-
-/* Yazı yazılan kutular */
-
-.stTextInput input,
-.stTextArea textarea {
-    background-color: #ffffff !important;
+.stApp { background-color: #fffaf2; color: #333333; }
+h1, h2, h3 { font-family: Georgia, serif; color: #333333; }
+p, label { color: #333333; }
+.stRadio label p, .stCheckbox label p { color: #403746 !important; }
+.stTextInput input, .stTextArea textarea {
+    background-color: white !important;
     color: #333333 !important;
-    caret-color: #76559b !important;
-    border: 1px solid rgba(120, 90, 160, 0.25) !important;
+    border: 1px solid #d8c9df !important;
     border-radius: 12px !important;
 }
-
-
-/* Yazı yazarken */
-
-.stTextInput input:focus,
-.stTextArea textarea:focus {
-    background-color: #ffffff !important;
-    color: #333333 !important;
-    border: 1px solid #a77ac7 !important;
-    box-shadow: 0 0 0 2px rgba(167, 122, 199, 0.15) !important;
-}
-
-
-/* Placeholder */
-
-.stTextInput input::placeholder,
-.stTextArea textarea::placeholder {
-    color: #777777 !important;
-    opacity: 1 !important;
-}
-
-
-/* =====================================================
-   VIBE TESTİ RADIO CEVAPLARI
-   ===================================================== */
-
-/* Soru açıklamaları */
-
-.stRadio > label {
-    color: #333333 !important;
-    font-weight: 600 !important;
-}
-
-
-/* Radio seçeneklerinin yazıları */
-
-.stRadio div[data-testid="stMarkdownContainer"] p {
-    color: #333333 !important;
-}
-
-
-/* Radio seçeneklerinin tamamı */
-
-.stRadio label {
-    color: #333333 !important;
-}
-
-
-/* Radio seçeneğinin yanındaki yazı */
-
-.stRadio label p {
-    color: #333333 !important;
-}
-
-
-/* Checkbox yazıları */
-
-.stCheckbox label {
-    color: #333333 !important;
-}
-
-.stCheckbox label p {
-    color: #333333 !important;
-}
-
-
-/* =====================================================
-   HAREKETLİ NOKTALAR
-   ===================================================== */
+.stTextInput input:focus, .stTextArea textarea:focus { border-color: #a77ac7 !important; }
+.stButton > button { border-radius: 12px; border: none; font-weight: 600; }
+.stButton > button:hover { transform: translateY(-2px); }
 
 .stApp::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-
-    background-image:
-        radial-gradient(
-            circle,
-            rgba(255, 190, 120, 0.30) 2px,
-            transparent 3px
-        ),
-        radial-gradient(
-            circle,
-            rgba(190, 150, 255, 0.25) 2px,
-            transparent 3px
-        );
-
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: radial-gradient(circle, rgba(255,190,120,.25) 2px, transparent 3px),
+                      radial-gradient(circle, rgba(190,150,255,.20) 2px, transparent 3px);
     background-size: 80px 80px, 110px 110px;
-
-    animation: moveDots 20s linear infinite;
+    animation: hareket 20s linear infinite;
 }
 
-
-@keyframes moveDots {
-
-    from {
-        background-position: 0 0, 30px 30px;
-    }
-
-    to {
-        background-position: 160px 160px, 200px 200px;
-    }
-
+@keyframes hareket {
+    from { background-position: 0 0, 30px 30px; }
+    to { background-position: 160px 160px, 200px 200px; }
 }
-
-
-/* =====================================================
-   BUTONLAR
-   ===================================================== */
-
-.stButton > button {
-    border-radius: 12px;
-    border: none;
-    padding: 10px 18px;
-    font-weight: 600;
-    transition: 0.2s;
-}
-
-
-.stButton > button:hover {
-    transform: translateY(-2px);
-}
-
-
-/* =====================================================
-   KART
-   ===================================================== */
 
 .kart {
-    background: rgba(255, 255, 255, 0.90);
+    background: rgba(255,255,255,.93);
     border-radius: 20px;
     padding: 20px;
     margin: 15px 0;
-
-    box-shadow:
-        0 5px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 5px 20px rgba(0,0,0,.08);
 }
-
-
-/* =====================================================
-   AVATAR
-   ===================================================== */
-
-.avatar {
-    font-size: 55px;
-    text-align: center;
+.avatar { font-size: 55px; text-align: center; }
+.vibe-kart {
+    border-radius: 25px; padding: 30px 20px; margin-top: 25px;
+    text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,.12);
 }
-
-
-/* =====================================================
-   SOSYAL MEDYA KUTULARI
-   ===================================================== */
-
-.sosyal-kutu {
-    background: rgba(255, 255, 255, 0.75);
-    border-radius: 15px;
-    padding: 12px;
-    margin-top: 8px;
-    border: 1px solid rgba(150, 120, 200, 0.15);
-}
-
+.vibe-emoji { font-size: 58px; }
+.vibe-baslik { font-family: Georgia, serif; font-size: 30px; font-weight: bold; color: #3e3045 !important; margin-top: 5px; }
+.vibe-yazi { color: #4b414f !important; font-size: 16px; line-height: 1.6; margin-top: 10px; }
+.vibe-alt { color: #665b6d !important; font-size: 14px; margin-top: 15px; }
 </style>
 """, unsafe_allow_html=True)
 
-
-# =========================================================
-# VERİTABANI
-# =========================================================
-
 def veritabani():
-
     conn = sqlite3.connect("ekiplen.db")
-
     conn.row_factory = sqlite3.Row
-
+    
     conn.execute("""
         CREATE TABLE IF NOT EXISTS kullanicilar (
-
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-
             kullanici_adi TEXT UNIQUE NOT NULL,
-
             sifre TEXT NOT NULL,
-
             avatar TEXT NOT NULL,
-
             vibe TEXT,
-
             instagram TEXT,
-
             tiktok TEXT,
-
             instagram_goster INTEGER DEFAULT 0,
-
             tiktok_goster INTEGER DEFAULT 0
-
         )
     """)
-
-
-    # Eski veritabanında yeni sütunlar yoksa ekle
-
-    kolonlar = conn.execute(
-        "PRAGMA table_info(kullanicilar)"
-    ).fetchall()
-
-    kolon_isimleri = [
-        kolon["name"]
-        for kolon in kolonlar
-    ]
-
-
+    
+    kolonlar = conn.execute("PRAGMA table_info(kullanicilar)").fetchall()
+    kolon_isimleri = [x["name"] for x in kolonlar]
+    
     if "instagram_goster" not in kolon_isimleri:
-
-        conn.execute("""
-            ALTER TABLE kullanicilar
-            ADD COLUMN instagram_goster INTEGER DEFAULT 0
-        """)
-
-
+        conn.execute("ALTER TABLE kullanicilar ADD COLUMN instagram_goster INTEGER DEFAULT 0")
     if "tiktok_goster" not in kolon_isimleri:
-
-        conn.execute("""
-            ALTER TABLE kullanicilar
-            ADD COLUMN tiktok_goster INTEGER DEFAULT 0
-        """)
-
-
-    # =====================================================
-    # DEĞERLENDİRME TABLOSU
-    # =====================================================
-
+        conn.execute("ALTER TABLE kullanicilar ADD COLUMN tiktok_goster INTEGER DEFAULT 0")
+        
     conn.execute("""
         CREATE TABLE IF NOT EXISTS degerlendirmeler (
-
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-
             kullanici_adi TEXT UNIQUE NOT NULL,
-
             arkadaslik_kurabildin_mi TEXT NOT NULL,
-
             testler_eglenceli_mi TEXT NOT NULL,
-
             neleri_gelistirebiliriz TEXT NOT NULL,
-
             neyi_begendin_veya_begenmedin TEXT NOT NULL,
-
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
-
         )
     """)
-
-
     conn.commit()
-
     return conn
 
-
 conn = veritabani()
+AVATARLAR = ["🌙", "⭐", "🌸", "🦋", "🐱", "🐼", "🦊", "🐨", "🌻", "🍀"]
 
+# Session state kontrolleri
+if "giris_yapildi" not in st.session_state: st.session_state.giris_yapildi = False
+if "kullanici_adi" not in st.session_state: st.session_state.kullanici_adi = None
+if "profil_tamamlandi" not in st.session_state: st.session_state.profil_tamamlandi = False
+if "sifreyi_goster" not in st.session_state: st.session_state.sifreyi_goster = False
+if "yonetici_giris" not in st.session_state: st.session_state.yonetici_giris = False
 
-# =========================================================
-# AVATARLAR
-# =========================================================
+def kullanici_getir(ad):
+    return conn.execute("SELECT * FROM kullanicilar WHERE kullanici_adi = ?", (ad,)).fetchone()
 
-AVATARLAR = [
-
-    "🌙",
-    "⭐",
-    "🌸",
-    "🦋",
-    "🐱",
-    "🐼",
-    "🦊",
-    "🐨",
-    "🌻",
-    "🍀"
-
-]
-
-
-# =========================================================
-# VIBE SONUÇLARI
-# =========================================================
-
-VIBE_SONUCLARI = [
-
-    "Enerjik Kaşif",
-    "Sakin Ruh",
-    "Kitap Kurdu",
-    "Müzik Tutkunu",
-    "Sosyal Kelebek"
-
-]
-
-
-# =========================================================
-# SESSION STATE
-# =========================================================
-
-if "giris_yapildi" not in st.session_state:
-
-    st.session_state.giris_yapildi = False
-
-
-if "kullanici_adi" not in st.session_state:
-
-    st.session_state.kullanici_adi = None
-
-
-if "profil_tamamlandi" not in st.session_state:
-
-    st.session_state.profil_tamamlandi = False
-
-
-if "sifreyi_goster" not in st.session_state:
-
-    st.session_state.sifreyi_goster = False
-
-
-if "yonetici_giris" not in st.session_state:
-
-    st.session_state.yonetici_giris = False
-
-
-# =========================================================
-# KULLANICI GETİR
-# =========================================================
-
-def kullanici_getir(kullanici_adi):
-
-    return conn.execute(
-        """
-        SELECT *
-        FROM kullanicilar
-        WHERE kullanici_adi = ?
-        """,
-        (kullanici_adi,)
-    ).fetchone()
-
-
-# =========================================================
-# DEĞERLENDİRME KONTROLÜ
-# =========================================================
-
-def degerlendirme_var_mi(kullanici_adi):
-
-    sonuc = conn.execute(
-        """
-        SELECT id
-        FROM degerlendirmeler
-        WHERE kullanici_adi = ?
-        """,
-        (kullanici_adi,)
-    ).fetchone()
-
+def degerlendirme_var_mi(ad):
+    sonuc = conn.execute("SELECT id FROM degerlendirmeler WHERE kullanici_adi = ?", (ad,)).fetchone()
     return sonuc is not None
 
-
-# =========================================================
-# EŞLEŞME KONTROLÜ
-# =========================================================
-
-def eslesme_var_mi(kullanici_adi):
-
-    kullanici = kullanici_getir(
-        kullanici_adi
-    )
-
-    if not kullanici or not kullanici["vibe"]:
-
-        return False
-
-
-    sonuc = conn.execute(
-        """
-        SELECT id
-        FROM kullanicilar
-        WHERE vibe = ?
-        AND kullanici_adi != ?
-        """,
-        (
-            kullanici["vibe"],
-            kullanici_adi
-        )
-    ).fetchone()
-
-
+def eslesme_var_mi(ad):
+    kisi = kullanici_getir(ad)
+    if not kisi or not kisi["vibe"]: return False
+    sonuc = conn.execute("SELECT id FROM kullanicilar WHERE vibe = ? AND kullanici_adi != ?", (kisi["vibe"], ad)).fetchone()
     return sonuc is not None
-
-
-# =========================================================
-# KVKK METNİ
-# =========================================================
 
 def kvkk_metni():
-
     st.markdown("""
 ### 📜 EKİPLEN KVKK Aydınlatma Metni
-
-**1. Veri Sorumlusu**
-
-EKİPLEN projesi kapsamında kullanıcı bilgilerinin güvenli
-şekilde işlenmesine önem veriyoruz.
-
-**2. İşlenen Kişisel Veriler**
-
-Uygulama içerisinde aşağıdaki bilgiler işlenebilir:
-
-- Kullanıcı adı
-- Şifre
-- Seçilen avatar
-- Vibe Testi sonucu
-- Kullanıcının isteğe bağlı olarak eklediği Instagram kullanıcı adı
-- Kullanıcının isteğe bağlı olarak eklediği TikTok kullanıcı adı
-- Sosyal medya bilgilerinin eşleşen kişilere gösterilmesine ilişkin tercih
-- EKİPLEN değerlendirme anketine verilen cevaplar
-
-**3. Kişisel Verilerin İşlenme Amaçları**
-
-Bu bilgiler;
-
-- Kullanıcı hesabının oluşturulması,
-- Kullanıcının uygulamaya giriş yapabilmesi,
-- Profilinin oluşturulması,
-- Vibe Testi sonucunun kaydedilmesi,
-- Benzer Vibe sonucuna sahip kullanıcıların eşleştirilmesi,
-- Kullanıcının kendi isteğiyle eklediği sosyal medya bilgilerinin
-  eşleşme sonuçlarında gösterilmesi,
-- EKİPLEN deneyiminin değerlendirilmesi ve geliştirilmesi
-
-amaçlarıyla kullanılmaktadır.
-
-**4. Sosyal Medya Bilgileri**
-
-Instagram ve TikTok kullanıcı adlarının eklenmesi isteğe bağlıdır.
-
-Kullanıcı bu bilgileri eklemediği takdirde uygulamayı kullanmaya
-devam edebilir.
-
-Kullanıcı sosyal medya hesabını eklese bile,
-hesabını eşleştiği kişilere gösterip göstermemeyi ayrıca seçebilir.
-
-**5. Profil Fotoğrafı**
-
-Kullanıcıların özel profil fotoğrafı yüklemesine izin verilmemektedir.
-
-Profil için yalnızca EKİPLEN tarafından sunulan hazır avatarlar
-kullanılmaktadır.
-
-**6. Değerlendirme Anketi**
-
-Kullanıcılar bir eşleşme gerçekleştikten sonra EKİPLEN deneyimini
-değerlendirmek amacıyla kısa bir değerlendirme anketini doldurur.
-
-Anket içerisinde arkadaşlık kurma durumu, testlerin eğlenceli olup
-olmadığı ve kullanıcının geliştirme önerileri ile beğendiği veya
-beğenmediği noktalar sorulmaktadır.
-
-**7. Veri Güvenliği**
-
-Kişisel verilerin güvenliğinin sağlanması amacıyla gerekli teknik
-ve idari tedbirlerin alınması hedeflenmektedir.
-
-**8. Kullanıcının Hakları**
-
-İlgili kişiler, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun
-11. maddesi kapsamında kanunda belirtilen haklarını kullanabilir.
-
-**9. İletişim**
-
-Kişisel verilerinizle ilgili sorularınız için EKİPLEN proje ekibi
-ile iletişime geçebilirsiniz.
-
-> Not: Bu metin teknik proje için örnek bir aydınlatma metnidir.
-
-> Yayına almadan önce proje ekibinizin gerçek bilgileriyle
-> güncellenmesi ve gerektiğinde hukuki uzman görüşü alınması gerekir.
-
+**1. Veri Sorumlusu:** EKİPLEN projesinde verilerinizin güvenliğine önem veriyoruz.
+**2. İşlenen Bilgiler:** Kullanıcı adı, şifre, avatar, Vibe sonucu ve isteğe bağlı sosyal medya hesapları.
+**3. Amaç:** Platform içi arkadaş eşleştirmesi ve deneyimi iyileştirme.
+**4. Sosyal Medya & Avatar:** Tamamen isteğe bağlıdır, standart avatarlar kullanılır.
+**5. Haklarınız:** 6698 sayılı KVKK kapsamındaki haklara sahipsiniz.
 """)
 
-
-# =========================================================
-# GİRİŞ EKRANI
-# =========================================================
-
+# Giriş Ekranı
 if not st.session_state.giris_yapildi:
-
     st.title("✨ EKİPLEN")
-
-    st.subheader(
-        "Lise Arkadaşlık ve Sosyal Ağ Platformu"
-    )
-
-    st.write(
-        "Burada kendini tanıyabilir, sana benzeyen insanlarla "
-        "eşleşebilir ve yeni arkadaşlıklar keşfedebilirsin. 💜"
-    )
-
+    st.subheader("Lise Arkadaşlık ve Sosyal Ağ Platformu")
+    st.write("Kendini tanıyabilir, sana benzeyen kişilerle eşleşebilir ve yeni arkadaşlıklar keşfedebilirsin. 💜")
     st.divider()
-
-
-    kullanici_adi = st.text_input(
-        "👤 Kullanıcı adı",
-        placeholder="Kullanıcı adını yaz..."
-    )
-
-
+    
+    kullanici_adi = st.text_input("👤 Kullanıcı adı", placeholder="Kullanıcı adını yaz...")
+    
     col1, col2 = st.columns([5, 1])
-
-
     with col1:
-
-        sifre_tipi = (
-            "default"
-            if st.session_state.sifreyi_goster
-            else "password"
-        )
-
-
-        sifre = st.text_input(
-            "🔐 Şifre",
-            type=sifre_tipi,
-            placeholder="Şifreni yaz...",
-            key="sifre_input"
-        )
-
-
+        sifre = st.text_input("🔐 Şifre", type="default" if st.session_state.sifreyi_goster else "password", placeholder="Şifreni yaz...")
     with col2:
-
         st.write("")
-
-
-        if st.button(
-            "🙈"
-            if st.session_state.sifreyi_goster
-            else "👁️",
-            help="Şifreyi göster/gizle"
-        ):
-
-            st.session_state.sifreyi_goster = (
-                not st.session_state.sifreyi_goster
-            )
-
+        if st.button("🙈" if st.session_state.sifreyi_goster else "👁️"):
+            st.session_state.sifreyi_goster = not st.session_state.sifreyi_goster
             st.rerun()
-
-
-    st.caption(
-        "👁️ Göz butonuyla şifreni gösterebilir veya gizleyebilirsin."
-    )
-
-
-    st.divider()
-
-
-    with st.expander(
-        "📜 KVKK Aydınlatma Metnini Oku"
-    ):
-
+            
+    with st.expander("📜 KVKK Aydınlatma Metni"):
         kvkk_metni()
-
-
-    kvkk_onay = st.checkbox(
-        "KVKK Aydınlatma Metnini okudum."
-    )
-
-
-    st.divider()
-
-
-    giris = st.button(
-        "✨ Giriş Yap",
-        use_container_width=True
-    )
-
-
-    if giris:
-
+        
+    kvkk_onay = st.checkbox("KVKK Aydınlatma Metnini okudum ve onaylıyorum.")
+    
+    if st.button("✨ Giriş Yap", use_container_width=True):
         if not kullanici_adi.strip() or not sifre.strip():
-
-            st.warning(
-                "Lütfen kullanıcı adı ve şifreyi doldur. 💜"
-            )
-
-
+            st.warning("Kullanıcı adı ve şifreyi doldurmalısın.")
         elif not kvkk_onay:
-
-            st.warning(
-                "Devam etmek için KVKK Aydınlatma Metnini "
-                "okuduğunu onaylamalısın. 📜"
-            )
-
-
+            st.warning("Devam etmek için KVKK metnini onaylamalısın.")
         else:
-
-            kullanici = kullanici_getir(
-                kullanici_adi
-            )
-
-
-            if kullanici:
-
-                if kullanici["sifre"] == sifre:
-
+            kisi = kullanici_getir(kullanici_adi.strip())
+            if kisi:
+                if kisi["sifre"] == sifre:
                     st.session_state.giris_yapildi = True
-
-                    st.session_state.kullanici_adi = (
-                        kullanici_adi
-                    )
-
-                    st.session_state.profil_tamamlandi = (
-                        bool(
-                            kullanici["instagram"]
-                            or
-                            kullanici["tiktok"]
-                        )
-                    )
-
-                    st.success(
-                        f"Tekrar hoş geldin, "
-                        f"{kullanici_adi}! ✨"
-                    )
-
+                    st.session_state.kullanici_adi = kullanici_adi.strip()
+                    st.session_state.profil_tamamlandi = True
+                    st.success(f"Tekrar hoş geldin, {kullanici_adi}! ✨")
                     st.rerun()
-
-
                 else:
-
-                    st.error(
-                        "Şifre yanlış. Tekrar kontrol eder misin? 🔐"
-                    )
-
-
+                    st.error("Şifre yanlış.")
             else:
-
-                conn.execute(
-                    """
-                    INSERT INTO kullanicilar
-                    (
-                        kullanici_adi,
-                        sifre,
-                        avatar
-                    )
-                    VALUES (?, ?, ?)
-                    """,
-                    (
-                        kullanici_adi,
-                        sifre,
-                        AVATARLAR[0]
-                    )
-                )
-
+                conn.execute("INSERT INTO kullanicilar (kullanici_adi, sifre, avatar) VALUES (?, ?, ?)", 
+                             (kullanici_adi.strip(), sifre, AVATARLAR[0]))
                 conn.commit()
-
-
                 st.session_state.giris_yapildi = True
-
-                st.session_state.kullanici_adi = (
-                    kullanici_adi
-                )
-
+                st.session_state.kullanici_adi = kullanici_adi.strip()
                 st.session_state.profil_tamamlandi = False
-
-                st.success(
-                    "Hesabın oluşturuldu! "
-                    "Şimdi profilini oluşturalım. 🌸"
-                )
-
+                st.success("Hesabın oluşturuldu! 🌸")
                 st.rerun()
-
-
     st.stop()
-
-
-# =========================================================
-# PROFİL OLUŞTURMA
-# =========================================================
 
 kullanici_adi = st.session_state.kullanici_adi
-
-kullanici = kullanici_getir(
-    kullanici_adi
-)
-
+kullanici = kullanici_getir(kullanici_adi)
 
 if not kullanici:
-
     st.error("Kullanıcı bulunamadı.")
-
     st.stop()
 
-
+# Profil Oluşturma Ekranı
 if not st.session_state.profil_tamamlandi:
-
     st.title("🌸 Profilini Oluştur")
-
-    st.write(
-        f"Hoş geldin **{kullanici_adi}**! "
-        "Önce kendine bir avatar seçelim."
-    )
-
-    st.info(
-        "Özel profil fotoğrafı yüklenemez. "
-        "Buradaki hazır avatarlardan birini seçebilirsin. 💜"
-    )
-
-
-    avatar = st.radio(
-        "✨ Avatarını seç",
-        AVATARLAR,
-        horizontal=True
-    )
-
-
-    instagram = st.text_input(
-        "📸 Instagram kullanıcı adın (isteğe bağlı)",
-        placeholder="@kullaniciadi"
-    )
-
-
-    tiktok = st.text_input(
-        "🎵 TikTok kullanıcı adın (isteğe bağlı)",
-        placeholder="@kullaniciadi"
-    )
-
-
-    st.subheader(
-        "🔒 Sosyal Medya Gizliliği"
-    )
-
-
-    instagram_goster = st.checkbox(
-        "📸 Instagram hesabımı eşleştiğim kişiye göster",
-        value=False
-    )
-
-
-    tiktok_goster = st.checkbox(
-        "🎵 TikTok hesabımı eşleştiğim kişiye göster",
-        value=False
-    )
-
-
-    st.caption(
-        "Bu seçenekleri açmadığın sürece Instagram ve TikTok "
-        "kullanıcı adların eşleşme sonuçlarında gösterilmez."
-    )
-
-
-    if st.button(
-        "💜 Profilimi Oluştur",
-        use_container_width=True
-    ):
-
-        conn.execute(
-            """
-            UPDATE kullanicilar
-            SET
-                avatar = ?,
-                instagram = ?,
-                tiktok = ?,
-                instagram_goster = ?,
-                tiktok_goster = ?
+    st.write(f"Hoş geldin **{kullanici_adi}**! Önce kendine bir avatar seç.")
+    
+    avatar = st.radio("✨ Avatar seç", AVATARLAR, horizontal=True)
+    instagram = st.text_input("📸 Instagram kullanıcı adın", placeholder="@kullaniciadi")
+    tiktok = st.text_input("🎵 TikTok kullanıcı adın", placeholder="@kullaniciadi")
+    
+    st.subheader("🔒 Sosyal Medya Tercihleri")
+    instagram_goster = st.checkbox("Instagram hesabımı eşleştiğim kişiye göster")
+    tiktok_goster = st.checkbox("TikTok hesabımı eşleştiğim kişiye göster")
+    
+    if st.button("💜 Profilimi Oluştur", use_container_width=True):
+        conn.execute("""
+            UPDATE kullanicilar SET avatar = ?, instagram = ?, tiktok = ?, instagram_goster = ?, tiktok_goster = ? 
             WHERE kullanici_adi = ?
-            """,
-            (
-                avatar,
-                instagram.strip(),
-                tiktok.strip(),
-                int(instagram_goster),
-                int(tiktok_goster),
-                kullanici_adi
-            )
-        )
-
+        """, (avatar, instagram.strip(), tiktok.strip(), int(instagram_goster), int(tiktok_goster), kullanici_adi))
         conn.commit()
-
         st.session_state.profil_tamamlandi = True
-
-        st.success(
-            "Profilin hazır! 🎉"
-        )
-
+        st.success("Profilin hazır! 🎉")
         st.rerun()
-
-
     st.stop()
 
-
-# =========================================================
-# ANA KULLANICI BİLGİSİ
-# =========================================================
-
-kullanici = kullanici_getir(
-    kullanici_adi
-)
-
-
-# =========================================================
-# ZORUNLU DEĞERLENDİRME KONTROLÜ
-# =========================================================
-
-if (
-    eslesme_var_mi(kullanici_adi)
-    and
-    not degerlendirme_var_mi(kullanici_adi)
-):
-
+# Değerlendirme Ekranı
+if eslesme_var_mi(kullanici_adi) and not degerlendirme_var_mi(kullanici_adi):
     st.title("⭐ Bizi Değerlendir")
-
-    st.write(
-        "Bir eşleşme gerçekleştirdin! 🎉 "
-        "Şimdi EKİPLEN deneyimini birkaç kısa soruyla "
-        "değerlendirmeni istiyoruz."
-    )
-
-
-    st.info(
-        "Bu değerlendirme zorunludur. "
-        "Cevaplarını gönderdikten sonra EKİPLEN'i "
-        "kullanmaya devam edebilirsin. 💜"
-    )
-
-
-    st.divider()
-
-
-    # -----------------------------------------------------
-    # SORU 1
-    # -----------------------------------------------------
-
-    st.subheader(
-        "1. Birisiyle arkadaşlık kurabildin mi?"
-    )
-
-
-    arkadaslik_kurabildin_mi = st.radio(
-        "Cevabını seç:",
-        [
-            "Evet",
-            "Hayır"
-        ],
-        key="degerlendirme_soru_1"
-    )
-
-
-    # -----------------------------------------------------
-    # SORU 2
-    # -----------------------------------------------------
-
-    st.subheader(
-        "2. Testler sence eğlenceli mi?"
-    )
-
-
-    testler_eglenceli_mi = st.radio(
-        "Cevabını seç:",
-        [
-            "Evet",
-            "Hayır",
-            "Biraz"
-        ],
-        key="degerlendirme_soru_2"
-    )
-
-
-    # -----------------------------------------------------
-    # SORU 3
-    # -----------------------------------------------------
-
-    st.subheader(
-        "3. Neleri geliştirebiliriz?"
-    )
-
-
-    neleri_gelistirebiliriz = st.text_area(
-        "Fikrini bizimle paylaş:",
-        placeholder="Buraya düşüncelerini yazabilirsin...",
-        key="degerlendirme_soru_3"
-    )
-
-
-    # -----------------------------------------------------
-    # SORU 4
-    # -----------------------------------------------------
-
-    st.subheader(
-        "4. Neyi beğendin veya beğenmedin?"
-    )
-
-
-    neyi_begendin_veya_begenmedin = st.text_area(
-        "Düşüncelerini yaz:",
-        placeholder="Beğendiğin veya beğenmediğin şeyleri yazabilirsin...",
-        key="degerlendirme_soru_4"
-    )
-
-
-    st.divider()
-
-
-    if st.button(
-        "💜 Değerlendirmeyi Gönder",
-        use_container_width=True
-    ):
-
-        if not neleri_gelistirebiliriz.strip():
-
-            st.warning(
-                "Lütfen 3. soruyu cevapla. 💭"
-            )
-
-
-        elif not neyi_begendin_veya_begenmedin.strip():
-
-            st.warning(
-                "Lütfen 4. soruyu cevapla. 💭"
-            )
-
-
+    st.write("Bir eşleşme gerçekleştirdin! EKİPLEN deneyimini kısaca değerlendirebilir misin?")
+    
+    arkadaslik = st.radio("1. Birisiyle arkadaşlık kurabildin mi?", ["Evet", "Hayır"])
+    testler = st.radio("2. Testler sence eğlenceli mi?", ["Evet", "Hayır", "Biraz"])
+    gelistirme = st.text_area("3. Neleri geliştirebiliriz?")
+    begendin = st.text_area("4. Neyi beğendin veya beğenmedin?")
+    
+    if st.button("💜 Değerlendirmeyi Gönder", use_container_width=True):
+        if not gelistirme.strip() or not begendin.strip():
+            st.warning("Lütfen boş bırakılan alanları doldur.")
         else:
-
-            conn.execute(
-                """
-                INSERT INTO degerlendirmeler
-                (
-                    kullanici_adi,
-                    arkadaslik_kurabildin_mi,
-                    testler_eglenceli_mi,
-                    neleri_gelistirebiliriz,
-                    neyi_begendin_veya_begenmedin
-                )
+            conn.execute("""
+                INSERT INTO degerlendirmeler (kullanici_adi, arkadaslik_kurabildin_mi, testler_eglenceli_mi, neleri_gelistirebiliriz, neyi_begendin_veya_begenmedin)
                 VALUES (?, ?, ?, ?, ?)
-                """,
-                (
-                    kullanici_adi,
-                    arkadaslik_kurabildin_mi,
-                    testler_eglenceli_mi,
-                    neleri_gelistirebiliriz.strip(),
-                    neyi_begendin_veya_begenmedin.strip()
-                )
-            )
-
+            """, (kullanici_adi, arkadaslik, testler, gelistirme.strip(), begendin.strip()))
             conn.commit()
-
-            st.success(
-                "Değerlendirmen için çok teşekkür ederiz! 💜✨"
-            )
-
+            st.success("Değerlendirmen için teşekkürler! 💜")
             st.balloons()
-
             st.rerun()
-
-
     st.stop()
 
-
-# =========================================================
-# ÜST BAŞLIK
-# =========================================================
-
+# Ana Sayfa ve Menü
 st.title("✨ EKİPLEN")
+st.write(f"Hoş geldin **{kullanici_adi}** {kullanici['avatar']}")
 
-st.write(
-    f"Hoş geldin **{kullanici_adi}** "
-    f"{kullanici['avatar']}"
-)
+sayfa = st.sidebar.radio("Menü", ["🏠 Ana Sayfa", "🧩 Vibe Testi", "👥 Arkadaş Eşleştirme", "👤 Profil", "👋 Biz Kimiz?", "📜 KVKK", "🔐 Yönetici"])
 
-
-# =========================================================
-# SIDEBAR
-# =========================================================
-
-st.sidebar.title("🌸 EKİPLEN")
-
-
-sayfa = st.sidebar.radio(
-    "Menü",
-    [
-        "🏠 Ana Sayfa",
-        "🧩 Vibe Testi",
-        "👥 Arkadaş Eşleştirme",
-        "👤 Profil",
-        "👋 Biz Kimiz?",
-        "📜 KVKK",
-        "🔐 Yönetici"
-    ]
-)
-
-
-# =========================================================
-# ÇIKIŞ
-# =========================================================
-
-if st.sidebar.button(
-    "🚪 Çıkış Yap"
-):
-
+if st.sidebar.button("🚪 Çıkış Yap"):
     st.session_state.giris_yapildi = False
-
     st.session_state.kullanici_adi = None
-
     st.session_state.profil_tamamlandi = False
-
     st.session_state.yonetici_giris = False
-
     st.rerun()
 
-
-# =========================================================
-# ANA SAYFA
-# =========================================================
-
 if sayfa == "🏠 Ana Sayfa":
-
     st.header("🌷 Hoş geldin!")
-
-    st.write(
-        """
-        EKİPLEN'de önce kendi Vibe'ını keşfedebilir,
-        daha sonra sana benzeyen kişilerle eşleşebilirsin.
-        """
-    )
-
-
-    st.info(
-        "🧩 Önce Vibe Testi'ni tamamla. "
-        "Sonrasında sana uyumlu kişileri "
-        "Arkadaş Eşleştirme bölümünde görebilirsin."
-    )
-
-
-# =========================================================
-# VIBE TESTİ
-# =========================================================
+    st.write("EKİPLEN'de önce kendi Vibe'ını bulabilir, sonra sana benzeyen kişilerle eşleşebilirsin.")
+    st.info("🧩 Önce Vibe Testi'ni tamamla. Sonra Arkadaş Eşleştirme bölümüne bakabilirsin.")
 
 elif sayfa == "🧩 Vibe Testi":
-
     st.header("🧩 Vibe Testi")
-
-    st.write(
-        "Sorulara sana en uygun cevabı ver. "
-        "Sonunda hangi Vibe'a sahip olduğunu göreceksin. ✨"
-    )
-
-
+    st.write("Sana en yakın cevabı seç. Test bitince Vibe'ın çıkacak. ✨")
+    
     sorular = [
-
-        "Boş zamanında en çok ne yaparsın?",
-
-        "Arkadaşların seni nasıl tanımlar?",
-
-        "Bir hafta sonunu nasıl geçirirdin?",
-
-        "En sevdiğin ortam hangisi?",
-
-        "Yeni insanlarla tanışmak hakkında ne düşünüyorsun?",
-
-        "Müzik senin için ne ifade ediyor?",
-
-        "Kitap okumayı sever misin?",
-
-        "Bir arkadaşında en çok neye önem verirsin?",
-
-        "Bir sorun olduğunda ne yaparsın?",
-
-        "Kalabalık ortamları sever misin?",
-
-        "Hayalindeki tatil nasıl olurdu?",
-
-        "En çok hangi özelliğine güveniyorsun?",
-
-        "Yeni şeyler denemeyi sever misin?",
-
-        "Arkadaşlık senin için ne demek?",
-
-        "Kendini tek kelimeyle nasıl tanımlarsın?"
-
+        {"soru": "Boş zamanında en çok ne yaparsın?", "cevaplar": [("Yeni yerler keşfetmeye çıkarım.", "Enerjik Kaşif"), ("Arkadaşlarımla buluşurum.", "Sosyal Kelebek"), ("Müzik dinler, yeni şarkılar bulurum.", "Müzik Tutkunu"), ("Kitap okur veya sakin bir şeyler yaparım.", "Kitap Kurdu")]},
+        {"soru": "Arkadaşların seni nasıl tanımlar?", "cevaplar": [("Yerimde duramam, sürekli bir şey yapmak isterim.", "Enerjik Kaşif"), ("Konuşkan ve insanlarla kolay anlaşan biriyim.", "Sosyal Kelebek"), ("Müzik konusunda bayağı ilgiliyim.", "Müzik Tutkunu"), ("Sessiz, sakin ve düşünceli biriyim.", "Sakin Ruh")]},
+        {"soru": "Bir hafta sonunu nasıl geçirmek isterdin?", "cevaplar": [("Daha önce gitmediğim bir yere giderdim.", "Enerjik Kaşif"), ("Arkadaş grubumla dışarı çıkardım.", "Sosyal Kelebek"), ("Konser veya müzik etkinliğine giderdim.", "Müzik Tutkunu"), ("Evde kitap okuyup dinlenirdim.", "Kitap Kurdu")]},
+        {"soru": "En sevdiğin ortam hangisi?", "cevaplar": [("Doğa, geziler ve yeni yerler.", "Enerjik Kaşif"), ("Kalabalık ve eğlenceli ortamlar.", "Sosyal Kelebek"), ("Konser, müzik odası veya festival.", "Müzik Tutkunu"), ("Kütüphane veya sessiz bir kafe.", "Sakin Ruh")]},
+        {"soru": "Yeni insanlarla tanışmak hakkında ne düşünüyorsun?", "cevaplar": [("Yeni insanlarla tanışmak bana macera gibi geliyor.", "Enerjik Kaşif"), ("Hemen sohbet başlatabilirim.", "Sosyal Kelebek"), ("Ortak müzik zevkimiz varsa daha kolay kaynaşırım.", "Müzik Tutkunu"), ("Önce biraz gözlemler, sonra konuşurum.", "Sakin Ruh")]},
+        {"soru": "Müzik senin için ne ifade ediyor?", "cevaplar": [("Yolculuklarda çok iyi gidiyor.", "Enerjik Kaşif"), ("Arkadaşlarla beraber dinlemek daha güzel.", "Sosyal Kelebek"), ("Günümün büyük bir parçası.", "Müzik Tutkunu"), ("Sakinleşmek için dinlerim.", "Sakin Ruh")]},
+        {"soru": "Kitap okumayı seviyor musun?", "cevaplar": [("Macera kitaplarını özellikle severim.", "Enerjik Kaşif"), ("Arkadaşlarımla kitap önerileri paylaşmayı severim.", "Sosyal Kelebek"), ("Müzik ve sanatla ilgili kitaplar ilgimi çeker.", "Müzik Tutkunu"), ("Kitap okumak benim için vazgeçilmez.", "Kitap Kurdu")]},
+        {"soru": "Bir arkadaşında en çok neye önem verirsin?", "cevaplar": [("Birlikte yeni şeyler deneyebilmemize.", "Enerjik Kaşif"), ("Eğlenceli ve konuşkan olmasına.", "Sosyal Kelebek"), ("Ortak ilgi alanlarımız olmasına.", "Müzik Tutkunu"), ("Beni anlayıp güven vermesine.", "Sakin Ruh")]},
+        {"soru": "Bir sorun olduğunda ne yaparsın?", "cevaplar": [("Hemen çözüm bulmaya çalışırım.", "Enerjik Kaşif"), ("Bir arkadaşıma anlatırım.", "Sosyal Kelebek"), ("Biraz müzik dinleyip kafamı toparlarım.", "Müzik Tutkunu"), ("Önce yalnız kalıp düşünürüm.", "Sakin Ruh")]},
+        {"soru": "Kalabalık ortamlar hakkında hangisi sana daha yakın?", "cevaplar": [("Yeni şeyler olduğu için hoşuma gider.", "Enerjik Kaşif"), ("Kalabalık ve eğlenceli yerleri severim.", "Sosyal Kelebek"), ("Konser veya festivalse kesinlikle giderim.", "Müzik Tutkunu"), ("Daha küçük ve sakin ortamları tercih ederim.", "Sakin Ruh")]},
+        {"soru": "Hayalindeki tatil nasıl olurdu?", "cevaplar": [("Farklı şehirler ve ülkeler keşfetmek.", "Enerjik Kaşif"), ("Arkadaş grubumla bol bol eğlenmek.", "Sosyal Kelebek"), ("Müzik festivali veya konsere gitmek.", "Müzik Tutkunu"), ("Sessiz bir yerde kitap okuyup dinlenmek.", "Kitap Kurdu")]},
+        {"soru": "En çok hangi özelliğine güveniyorsun?", "cevaplar": [("Meraklı ve cesur olmama.", "Enerjik Kaşif"), ("İnsanlarla kolay iletişim kurmama.", "Sosyal Kelebek"), ("Yaratıcılığıma ve müzik zevkime.", "Müzik Tutkunu"), ("Düşünceli ve sakin olmama.", "Sakin Ruh")]},
+        {"soru": "Yeni şeyler denemek konusunda nasılsın?", "cevaplar": [("İlk deneyenlerden biri olurum.", "Enerjik Kaşif"), ("Arkadaşlarımla beraber denerim.", "Sosyal Kelebek"), ("Müzikle ilgiliyse kesin denerim.", "Müzik Tutkunu"), ("Önce araştırır, sonra karar veririm.", "Kitap Kurdu")]},
+        {"soru": "Arkadaşlık senin için en çok ne demek?", "cevaplar": [("Birlikte macera yaşamak.", "Enerjik Kaşif"), ("Sürekli iletişimde olmak ve eğlenmek.", "Sosyal Kelebek"), ("Ortak ilgi alanları paylaşmak.", "Müzik Tutkunu"), ("Güvenmek ve rahatça konuşabilmek.", "Sakin Ruh")]},
+        {"soru": "Kendini en çok hangisine yakın hissediyorsun?", "cevaplar": [("Meraklı ve keşfetmeyi seven.", "Enerjik Kaşif"), ("Sosyal ve hareketli.", "Sosyal Kelebek"), ("Yaratıcı ve müzik seven.", "Müzik Tutkunu"), ("Kitap okumayı ve düşünmeyi seven.", "Kitap Kurdu")]}
     ]
-
-
-    cevaplar = [
-
-        "Çok severim",
-
-        "Bazen",
-
-        "Pek değil",
-
-        "Hiç sevmem"
-
-    ]
-
-
-    puan = 0
-
-
+    
+    puanlar = {"Enerjik Kaşif": 0, "Sakin Ruh": 0, "Kitap Kurdu": 0, "Müzik Tutkunu": 0, "Sosyal Kelebek": 0}
+    cevaplar = []
+    
     for i, soru in enumerate(sorular):
-
-        st.markdown(
-            f"### {i + 1}. {soru}"
-        )
-
-
-        cevap = st.radio(
-            "Cevabın:",
-            cevaplar,
-            key=f"soru_{i}"
-        )
-
-
-        if cevap == "Çok severim":
-
-            puan += 4
-
-        elif cevap == "Bazen":
-
-            puan += 3
-
-        elif cevap == "Pek değil":
-
-            puan += 2
-
-        else:
-
-            puan += 1
-
-
-    if st.button(
-        "✨ Vibe'ımı Bul",
-        use_container_width=True
-    ):
-
-        ortalama = (
-            puan / len(sorular)
-        )
-
-
-        if ortalama >= 3.5:
-
-            vibe = "Enerjik Kaşif"
-
-        elif ortalama >= 2.8:
-
-            vibe = "Sosyal Kelebek"
-
-        elif ortalama >= 2.2:
-
-            vibe = "Müzik Tutkunu"
-
-        elif ortalama >= 1.6:
-
-            vibe = "Kitap Kurdu"
-
-        else:
-
-            vibe = "Sakin Ruh"
-
-
-        conn.execute(
-            """
-            UPDATE kullanicilar
-            SET vibe = ?
-            WHERE kullanici_adi = ?
-            """,
-            (
-                vibe,
-                kullanici_adi
-            )
-        )
-
+        st.markdown(f"### {i + 1}. {soru['soru']}")
+        secenekler = [cevap for cevap, vibe in soru["cevaplar"]]
+        secim = st.radio("Cevabın:", secenekler, key=f"soru_{i}")
+        cevaplar.append(secim)
+        
+    if st.button("✨ Vibe'ımı Bul", use_container_width=True):
+        for i in range(len(sorular)):
+            for cevap, vibe in sorular[i]["cevaplar"]:
+                if cevap == cevaplar[i]:
+                    puanlar[vibe] += 1
+                    
+        en_yuksek = max(puanlar.values())
+        kazananlar = [vibe for vibe, puan in puanlar.items() if puan == en_yuksek]
+        vibe = kazananlar[0]
+        
+        conn.execute("UPDATE kullanicilar SET vibe = ? WHERE kullanici_adi = ?", (vibe, kullanici_adi))
         conn.commit()
-
-
-        st.success(
-            f"🎉 Senin Vibe'ın: **{vibe}**"
-        )
-
+        
+        bilgiler = {
+            "Enerjik Kaşif": ("🧭", "#ffe5b4", "Yeni şeyler keşfetmeyi, gezmeyi ve farklı deneyimler yaşamayı seviyorsun. Yerinde durmak sana göre değil!"),
+            "Sakin Ruh": ("🌿", "#dcefe3", "Daha sakin ortamlardan hoşlanıyor, huzuru ve güveni önemsiyorsun. Kendi alanında vakit geçirmek sana iyi geliyor."),
+            "Kitap Kurdu": ("📚", "#e8ddf5", "Hayal gücün güçlü ve yeni şeyler öğrenmeyi seviyorsun. Kitaplar ve hikayeler senin dünyanda önemli."),
+            "Müzik Tutkunu": ("🎵", "#f3d9e8", "Müzik senin için sadece arka planda çalan bir şey değil. Ruh halini ve anılarını etkiliyor."),
+            "Sosyal Kelebek": ("🦋", "#ffe0d0", "İnsanlarla konuşmayı, birlikte vakit geçirmeyi ve yeni arkadaşlıklar kurmayı seviyorsun.")
+        }
+        
+        emoji, renk, aciklama = bilgiler[vibe]
+        st.markdown(f"""
+        <div class="vibe-kart" style="background-color:{renk};">
+            <div class="vibe-emoji">{emoji}</div>
+            <div class="vibe-baslik">Senin Vibe'ın: {vibe}</div>
+            <div class="vibe-yazi">{aciklama}</div>
+            <div class="vibe-alt">✨ Bu sonuç cevaplarına göre oluşturuldu.</div>
+        </div>
+        """, unsafe_allow_html=True)
         st.balloons()
 
-
-# =========================================================
-# ARKADAŞ EŞLEŞTİRME
-# =========================================================
-
 elif sayfa == "👥 Arkadaş Eşleştirme":
-
     st.header("👥 Arkadaş Eşleştirme")
-
-
-    kullanici = kullanici_getir(
-        kullanici_adi
-    )
-
-
+    kullanici = kullanici_getir(kullanici_adi)
+    
     if not kullanici["vibe"]:
-
-        st.warning(
-            "Önce Vibe Testi'ni tamamlamalısın. 🧩"
-        )
-
-
+        st.warning("Önce Vibe Testi'ni tamamlamalısın. 🧩")
     else:
-
-        st.success(
-            f"Senin Vibe'ın: **{kullanici['vibe']}**"
-        )
-
-
-        eslesenler = conn.execute(
-            """
-            SELECT *
-            FROM kullanicilar
-            WHERE vibe = ?
-            AND kullanici_adi != ?
-            """,
-            (
-                kullanici["vibe"],
-                kullanici_adi
-            )
-        ).fetchall()
-
-
-        if not eslesenler:
-
-            st.info(
-                "Şimdilik seninle aynı Vibe'a sahip "
-                "başka biri yok. Yeni kişiler katıldıkça "
-                "burada görünecekler. 🌷"
-            )
-
-
+        st.success(f"Senin Vibe'ın: **{kullanici['vibe']}**")
+        kisiler = conn.execute("SELECT * FROM kullanicilar WHERE vibe = ? AND kullanici_adi != ?", (kullanici["vibe"], kullanici_adi)).fetchall()
+        
+        if not kisiler:
+            st.info("Şimdilik seninle aynı Vibe'a sahip başka biri yok.")
         else:
-
-            st.subheader(
-                "✨ Sana uyumlu kişiler"
-            )
-
-
-            for kisi in eslesenler:
-
-                st.markdown(
-                    f"""
-                    <div class="kart">
-
-                        <div class="avatar">
-                            {kisi['avatar']}
-                        </div>
-
-                        <h3 style="text-align:center;">
-                            {kisi['kullanici_adi']}
-                        </h3>
-
-                        <p style="text-align:center;">
-                            🧩 {kisi['vibe']}
-                        </p>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-
-                if (
-                    kisi["instagram"]
-                    and
-                    kisi["instagram_goster"]
-                ):
-
-                    instagram_adi = (
-                        kisi["instagram"]
-                        .strip()
-                        .replace("@", "")
-                    )
-
-
-                    instagram_link = (
-                        f"https://instagram.com/"
-                        f"{instagram_adi}"
-                    )
-
-
-                    st.markdown(
-                        f"📸 **Instagram:** "
-                        f"[@{instagram_adi}]({instagram_link})"
-                    )
-
-
-                if (
-                    kisi["tiktok"]
-                    and
-                    kisi["tiktok_goster"]
-                ):
-
-                    tiktok_adi = (
-                        kisi["tiktok"]
-                        .strip()
-                        .replace("@", "")
-                    )
-
-
-                    tiktok_link = (
-                        f"https://www.tiktok.com/"
-                        f"@{tiktok_adi}"
-                    )
-
-
-                    st.markdown(
-                        f"🎵 **TikTok:** "
-                        f"[@{tiktok_adi}]({tiktok_link})"
-                    )
-
-
-                if (
-                    (
-                        not kisi["instagram"]
-                        or
-                        not kisi["instagram_goster"]
-                    )
-                    and
-                    (
-                        not kisi["tiktok"]
-                        or
-                        not kisi["tiktok_goster"]
-                    )
-                ):
-
-                    st.caption(
-                        "Bu kullanıcı sosyal medya hesaplarını "
-                        "eşleştiği kişilere göstermeyi seçmemiş."
-                    )
-
-
+            st.subheader("✨ Sana uyumlu kişiler")
+            for kisi in kisiler:
+                st.markdown(f"""
+                <div class="kart">
+                    <div class="avatar">{kisi['avatar']}</div>
+                    <h3 style="text-align:center;">{kisi['kullanici_adi']}</h3>
+                    <p style="text-align:center;">🧩 {kisi['vibe']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                if kisi["instagram"] and kisi["instagram_goster"]:
+                    ig = kisi["instagram"].strip().replace("@", "")
+                    st.markdown(f"📸 Instagram: [@{ig}](https://instagram.com/{ig})")
+                if kisi["tiktok"] and kisi["tiktok_goster"]:
+                    tt = kisi["tiktok"].strip().replace("@", "")
+                    st.markdown(f"🎵 TikTok: [@{tt}](https://www.tiktok.com/@{tt})")
+                    
+                if (not kisi["instagram"] or not kisi["instagram_goster"]) and (not kisi["tiktok"] or not kisi["tiktok_goster"]):
+                    st.caption("Bu kullanıcı sosyal medya hesaplarını göstermiyor.")
                 st.divider()
-
-
-# =========================================================
-# PROFİL
-# =========================================================
 
 elif sayfa == "👤 Profil":
-
     st.header("👤 Profilim")
-
-
-    kullanici = kullanici_getir(
-        kullanici_adi
-    )
-
-
-    st.markdown(
-        f"""
-        <div class="kart">
-
-            <div class="avatar">
-                {kullanici['avatar']}
-            </div>
-
-            <h2 style="text-align:center;">
-                {kullanici['kullanici_adi']}
-            </h2>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
+    kullanici = kullanici_getir(kullanici_adi)
+    
+    st.markdown(f"""
+    <div class="kart">
+        <div class="avatar">{kullanici['avatar']}</div>
+        <h2 style="text-align:center;">{kullanici['kullanici_adi']}</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    
     if kullanici["vibe"]:
-
-        st.write(
-            f"🧩 **Vibe:** {kullanici['vibe']}"
-        )
-
+        st.write(f"🧩 **Vibe:** {kullanici['vibe']}")
     else:
-
-        st.write(
-            "🧩 Vibe testini henüz tamamlamadın."
-        )
-
-
+        st.write("🧩 Vibe testini henüz tamamlamadın.")
+        
     st.divider()
-
-
     st.subheader("🔗 Sosyal Medya")
-
-
+    
     if kullanici["instagram"]:
-
-        instagram_adi = (
-            kullanici["instagram"]
-            .strip()
-            .replace("@", "")
-        )
-
-
-        instagram_link = (
-            f"https://instagram.com/"
-            f"{instagram_adi}"
-        )
-
-
-        st.markdown(
-            f"📸 **Instagram:** "
-            f"[@{instagram_adi}]({instagram_link})"
-        )
-
-
-        if kullanici["instagram_goster"]:
-
-            st.caption(
-                "🔓 Eşleştiğin kişiler Instagram hesabını görebilir."
-            )
-
-        else:
-
-            st.caption(
-                "🔒 Instagram hesabın eşleştiğin kişilere gösterilmiyor."
-            )
-
-
+        ig = kullanici["instagram"].strip().replace("@", "")
+        st.markdown(f"📸 **Instagram:** [@{ig}](https://instagram.com/{ig})")
+        st.caption("🔓 Eşleştiğin kişiler görebilir." if kullanici["instagram_goster"] else "🔒 Eşleştiğin kişiler göremez.")
+        
     if kullanici["tiktok"]:
-
-        tiktok_adi = (
-            kullanici["tiktok"]
-            .strip()
-            .replace("@", "")
-        )
-
-
-        tiktok_link = (
-            f"https://www.tiktok.com/"
-            f"@{tiktok_adi}"
-        )
-
-
-        st.markdown(
-            f"🎵 **TikTok:** "
-            f"[@{tiktok_adi}]({tiktok_link})"
-        )
-
-
-        if kullanici["tiktok_goster"]:
-
-            st.caption(
-                "🔓 Eşleştiğin kişiler TikTok hesabını görebilir."
-            )
-
-        else:
-
-            st.caption(
-                "🔒 TikTok hesabın eşleştiğin kişilere gösterilmiyor."
-            )
-
-
-    if (
-        not kullanici["instagram"]
-        and
-        not kullanici["tiktok"]
-    ):
-
-        st.caption(
-            "Henüz sosyal medya hesabı eklemedin."
-        )
-
-
+        tt = kullanici["tiktok"].strip().replace("@", "")
+        st.markdown(f"🎵 **TikTok:** [@{tt}](https://www.tiktok.com/@{tt})")
+        st.caption("🔓 Eşleştiğin kişiler görebilir." if kullanici["tiktok_goster"] else "🔒 Eşleştiğin kişiler göremez.")
+        
+    if not kullanici["instagram"] and not kullanici["tiktok"]:
+        st.caption("Henüz sosyal medya hesabı eklemedin.")
+        
     st.divider()
-
-
-    st.subheader(
-        "✏️ Profilini düzenle"
-    )
-
-
-    mevcut_avatar = kullanici["avatar"]
-
-
-    yeni_avatar = st.radio(
-        "Avatarını değiştir",
-        AVATARLAR,
-        index=(
-            AVATARLAR.index(mevcut_avatar)
-            if mevcut_avatar in AVATARLAR
-            else 0
-        ),
-        horizontal=True
-    )
-
-
-    yeni_instagram = st.text_input(
-        "📸 Instagram kullanıcı adın",
-        value=kullanici["instagram"] or "",
-        placeholder="@kullaniciadi"
-    )
-
-
-    yeni_tiktok = st.text_input(
-        "🎵 TikTok kullanıcı adın",
-        value=kullanici["tiktok"] or "",
-        placeholder="@kullaniciadi"
-    )
-
-
-    st.subheader(
-        "🔒 Sosyal Medya Gizliliği"
-    )
-
-
-    yeni_instagram_goster = st.checkbox(
-        "📸 Instagram hesabımı eşleştiğim kişiye göster",
-        value=bool(kullanici["instagram_goster"])
-    )
-
-
-    yeni_tiktok_goster = st.checkbox(
-        "🎵 TikTok hesabımı eşleştiğim kişiye göster",
-        value=bool(kullanici["tiktok_goster"])
-    )
-
-
-    st.caption(
-        "Bu seçenekleri kapatırsan sosyal medya kullanıcı adların "
-        "eşleşme sonuçlarında gösterilmez."
-    )
-
-
-    if st.button(
-        "💾 Profili Kaydet",
-        use_container_width=True
-    ):
-
-        conn.execute(
-            """
-            UPDATE kullanicilar
-            SET
-                avatar = ?,
-                instagram = ?,
-                tiktok = ?,
-                instagram_goster = ?,
-                tiktok_goster = ?
+    st.subheader("✏️ Profili Düzenle")
+    
+    avatar = st.radio("Avatar", AVATARLAR, index=AVATARLAR.index(kullanici["avatar"]) if kullanici["avatar"] in AVATARLAR else 0, horizontal=True)
+    instagram = st.text_input("📸 Instagram", value=kullanici["instagram"] or "", placeholder="@kullaniciadi")
+    tiktok = st.text_input("🎵 TikTok", value=kullanici["tiktok"] or "", placeholder="@kullaniciadi")
+    instagram_goster = st.checkbox("Instagram hesabımı eşleştiğim kişiye göster", value=bool(kullanici["instagram_goster"]))
+    tiktok_goster = st.checkbox("TikTok hesabımı eşleştiğim kişiye göster", value=bool(kullanici["tiktok_goster"]))
+    
+    if st.button("💾 Profili Kaydet", use_container_width=True):
+        conn.execute("""
+            UPDATE kullanicilar SET avatar = ?, instagram = ?, tiktok = ?, instagram_goster = ?, tiktok_goster = ? 
             WHERE kullanici_adi = ?
-            """,
-            (
-                yeni_avatar,
-                yeni_instagram.strip(),
-                yeni_tiktok.strip(),
-                int(yeni_instagram_goster),
-                int(yeni_tiktok_goster),
-                kullanici_adi
-            )
-        )
-
+        """, (avatar, instagram.strip(), tiktok.strip(), int(instagram_goster), int(tiktok_goster), kullanici_adi))
         conn.commit()
-
-        st.success(
-            "Profilin güncellendi! 💜"
-        )
-
+        st.success("Profil güncellendi! 💜")
         st.rerun()
 
-
-# =========================================================
-# BİZ KİMİZ?
-# =========================================================
-
 elif sayfa == "👋 Biz Kimiz?":
-
     st.title("👋 Biz Kimiz?")
-
-
-    st.markdown(
-        """
-        <div class="kart">
-
-        <h2 style="text-align:center;">
-            💜 High Five Ekibi
-        </h2>
-
-        <p>
-        Merhaba! Biz <b>High Five ekibiyiz.</b> 👋
-        </p>
-
-        <p>
-        Bu projeyi, <b>15-18 yaş arasındaki, yaşıtlarıyla
-        iletişim kurmakta zorlanan kişiler</b> için geliştirdik.
-        Amacımız, eğlenceli testlerimizi cevaplayarak kendinize
-        uygun kişilerle tanışmanızı ve yeni arkadaşlıklar
-        kurmanızı sağlamak.
-        </p>
-
-        <p>
-        İsterseniz <b>Instagram</b>, isterseniz <b>TikTok</b>
-        hesabınızı paylaşarak eşleştiğiniz kişilerle iletişime
-        geçebilir ya da sadece testleri çözerek sizler için
-        oluşturduğumuz <b>"Vibe Kartları"</b>nı kazanabilirsiniz. ✨
-        </p>
-
-        <p>
-        Şimdiden iyi eğlenceler! 🌸
-        </p>
-
-        <p style="text-align:center;">
-        <b>
-        Sevgilerle,<br>
-        High Five Ekibi 💜
-        </b>
-        </p>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-# =========================================================
-# KVKK SAYFASI
-# =========================================================
+    st.markdown("""
+    <div class="kart">
+        <h2 style="text-align:center;">💜 High Five Ekibi</h2>
+        <p>Merhaba! Biz <b>High Five ekibiyiz.</b> 👋</p>
+        <p>Bu projeyi 15-18 yaş arasındaki kişilerin yaşıtlarıyla tanışabilmesi ve yeni arkadaşlıklar kurabilmesi için yaptık.</p>
+        <p>Vibe testlerini çözerek kendine uygun kişileri bulabilir, istersen Instagram veya TikTok hesabını paylaşabilirsin.</p>
+        <p>İyi eğlenceler! 🌸</p>
+        <p style="text-align:center;"><b>Sevgilerle,<br>High Five Ekibi 💜</b></p>
+    </div>
+    """, unsafe_allow_html=True)
 
 elif sayfa == "📜 KVKK":
-
-    st.title("📜 KVKK Aydınlatma Metni")
-
+    st.title("📜 KVKK")
     kvkk_metni()
 
-
-# =========================================================
-# YÖNETİCİ SAYFASI
-# =========================================================
-
 elif sayfa == "🔐 Yönetici":
-
     st.title("🔐 Yönetici Paneli")
-
-
-    st.write(
-        "Bu bölüm yalnızca EKİPLEN proje yöneticisinin "
-        "değerlendirmeleri görüntülemesi için kullanılmaktadır."
-    )
-
-
-    st.divider()
-
-
-    # -----------------------------------------------------
-    # YÖNETİCİ GİRİŞİ
-    # -----------------------------------------------------
-
     if not st.session_state.yonetici_giris:
-
-        st.subheader("🔑 Yönetici Girişi")
-
-
-        yonetici_sifre = st.text_input(
-            "Yönetici şifresi",
-            type="password",
-            placeholder="Yönetici şifreni yaz..."
-        )
-
-
-        if st.button(
-            "🔓 Yönetici Girişi Yap",
-            use_container_width=True
-        ):
-
-            if yonetici_sifre == YONETICI_SIFRE:
-
+        sifre = st.text_input("Yönetici şifresi", type="password")
+        if st.button("🔓 Giriş Yap", use_container_width=True):
+            if sifre == YONETICI_SIFRE:
                 st.session_state.yonetici_giris = True
-
-                st.success(
-                    "Yönetici girişi başarılı! 🔐"
-                )
-
                 st.rerun()
-
-
             else:
-
-                st.error(
-                    "Yönetici şifresi yanlış."
-                )
-
-
-    # -----------------------------------------------------
-    # DEĞERLENDİRMELER
-    # -----------------------------------------------------
-
+                st.error("Şifre yanlış.")
     else:
-
-        st.subheader(
-            "⭐ Kullanıcı Değerlendirmeleri"
-        )
-
-
-        degerlendirmeler = conn.execute(
-            """
-            SELECT *
-            FROM degerlendirmeler
-            ORDER BY created_at DESC
-            """
-        ).fetchall()
-
-
+        st.subheader("⭐ Değerlendirmeler")
+        degerlendirmeler = conn.execute("SELECT * FROM degerlendirmeler ORDER BY created_at DESC").fetchall()
+        
         if not degerlendirmeler:
-
-            st.info(
-                "Henüz gönderilmiş bir değerlendirme yok. 💭"
-            )
-
-
+            st.info("Henüz değerlendirme yok.")
         else:
-
-            st.success(
-                f"Toplam {len(degerlendirmeler)} "
-                f"değerlendirme bulundu. ✨"
-            )
-
-
-            for degerlendirme in degerlendirmeler:
-
-                st.markdown(
-                    f"""
-                    <div class="kart">
-
-                        <h3>
-                            👤 {degerlendirme['kullanici_adi']}
-                        </h3>
-
-                        <p>
-                            <b>
-                                👥 Birisiyle arkadaşlık kurabildin mi?
-                            </b>
-                            <br>
-                            {degerlendirme['arkadaslik_kurabildin_mi']}
-                        </p>
-
-                        <p>
-                            <b>
-                                🧩 Testler sence eğlenceli mi?
-                            </b>
-                            <br>
-                            {degerlendirme['testler_eglenceli_mi']}
-                        </p>
-
-                        <p>
-                            <b>
-                                💡 Neleri geliştirebiliriz?
-                            </b>
-                            <br>
-                            {degerlendirme['neleri_gelistirebiliriz']}
-                        </p>
-
-                        <p>
-                            <b>
-                                💜 Neyi beğendin veya beğenmedin?
-                            </b>
-                            <br>
-                            {degerlendirme['neyi_begendin_veya_begenmedin']}
-                        </p>
-
-                        <p>
-                            <b>
-                                📅 Tarih:
-                            </b>
-                            {degerlendirme['created_at']}
-                        </p>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-
-                st.divider()
-
-
-        if st.button(
-            "🚪 Yönetici Çıkışı",
-            use_container_width=True
-        ):
-
+            for d in degerlendirmeler:
+                st.markdown(f"""
+                <div class="kart">
+                    <h3>👤 {d['kullanici_adi']}</h3>
+                    <p><b>Arkadaşlık kurabildin mi?</b><br>{d['arkadaslik_kurabildin_mi']}</p>
+                    <p><b>Testler eğlenceli mi?</b><br>{d['testler_eglenceli_mi']}</p>
+                    <p><b>Neleri geliştirebiliriz?</b><br>{d['neleri_gelistirebiliriz']}</p>
+                    <p><b>Neyi beğendin veya beğenmedin?</b><br>{d['neyi_begendin_veya_begenmedin']}</p>
+                    <p><b>Tarih:</b> {d['created_at']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+        if st.button("🚪 Yönetici Çıkışı", use_container_width=True):
             st.session_state.yonetici_giris = False
-
             st.rerun()
