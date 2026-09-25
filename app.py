@@ -1739,4 +1739,4 @@ elif sayfa == "🔐 Yönetici":
             st.session_state.yonetici_giris = False
 
             st.rerun()
-```
+
