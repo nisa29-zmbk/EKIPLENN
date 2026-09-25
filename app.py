@@ -7,7 +7,7 @@ import streamlit as st
 # YÖNETİCİ ŞİFRESİ
 # =========================================================
 
-YONETICI_SIFRE = "BURAYA_KENDI_SIFRENİ_YAZ"
+YONETICI_SIFRE = "EKİPLENSİNN05"
 
 
 # =========================================================
